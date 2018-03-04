@@ -27,10 +27,8 @@ def normalize(x_all, x_test)：
     mu = np.tile(mu, (x_train_test.shape[0], 1))
     sigma = np.tile(sigma, (x_train_test.shape[0], 1))
     x_train_test_normed = (x_train_test -mu) / sigma
-
     x_all = x_train_test_normed[0:x_all.shape[0]]
     x_test = x_train_test_normed[x_all.shape[0],:]
-
     return x_all, x_test
 
 def sigmoid(x):
