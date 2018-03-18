@@ -1,3 +1,4 @@
 train_data/
 .vscode/
 .gitignore
+my_model_weights
