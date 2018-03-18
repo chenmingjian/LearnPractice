@@ -32,3 +32,7 @@ y_train = keras.utils.to_categorical(y_train, num_classes)
 y_test = keras.utils.to_categorical(y_test, num_classes)
 print (y_train)
 
+inputs = Input(shape=input_shape)
+
+block1 = Conv2D(32, kernel_size=(3,3), activation='relu') (inputs)
+block1 = MaxPooling2D(pool_size=(2,2))(block1)
