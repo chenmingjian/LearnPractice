@@ -72,3 +72,5 @@ print('Test accuracy:', score[1])
 model.save_weights('my_model_weights')
 
 plot_model(model, to_file='model.png')
+
+print(model.summary())
