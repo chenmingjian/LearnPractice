@@ -13,7 +13,9 @@ import matplotlib.pyplot as plt
 import os
 import argparse
 import time
-os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
+import win_unicode_console
+win_unicode_console.enable()
+PATIENCE = 5
 
 
 def build_model(input_shape):
@@ -34,10 +36,12 @@ def build_model(input_shape):
     return model
 
 
-def train(input_shape,batch_size, num_epoch, pretrain,
-          save_every, x_train, y_train, model_name=None):
+def train(input_shape, batch_size, num_epoch, pretrain, save_every, x_train, y_train, x_test, y_test, model_name=None):
     if pretrain == False:
         model = build_model(input_shape)
+        model.compile(optimizer='adam',
+                      loss='categorical_crossentropy',
+                      metrics=['accuracy'])
         '''
         model.compile(optimizer='adam',
                         loss='categorical_crossentropy',
@@ -50,6 +54,9 @@ def train(input_shape,batch_size, num_epoch, pretrain,
         '''
     else:
         model = load_model(model_name)
+        model.compile(optimizer='adam',
+                      loss='categorical_crossentropy',
+                      metrics=['accuracy'])
         '''
         model.load_weights('my_model_weights')
         model.compile(optimizer='adam',
@@ -64,11 +71,11 @@ def train(input_shape,batch_size, num_epoch, pretrain,
         batch_cutoff.append(batch_size * (i+1))
     batch_cutoff.append(num_instances)
 
-    total_start = time.time()
+    total_start_t = time.time()
     best_metrics = 0.0
     early_step_counter = 0
     for e in range(num_epoch):
-        rand_dixs = np.random.permutation(num_instances)
+        rand_idxs = np.random.permutation(num_instances)
         print('#######')
         print('Epoch' + str(e+1))
         print('#######')
@@ -81,13 +88,10 @@ def train(input_shape,batch_size, num_epoch, pretrain,
             Y_batch = []
             # fill data into each batch
             for n in range(batch_cutoff[i], batch_cutoff[i+1]):
-                X_batch.append(x_train[rand_dixs[n]])
-                Y_batch.append(np.zeros((7, ), dtype=np.float))
-                X_batch[-1] = np.fromstring(X_batch[-1],
-                                            dtype=float, sep=' ').reshape((28, 28, 1))
-                Y_batch[-1][int(train_labels[rand_idxs[n]])] = 1.
+                X_batch.append(x_train[rand_idxs[n]])
+                Y_batch.append(y_train[rand_idxs[n]])
             model.train_on_batch(np.asarray(X_batch), np.asarray(Y_batch))
-        loss_and_metrics = model.evaluate(val_pixels, val_labels, batch_size)
+        loss_and_metrics = model.evaluate(x_test, y_test, batch_size)
         print('\nloss & metrics:')
         print(loss_and_metrics)
         if loss_and_metrics[1] >= best_metrics:
@@ -97,13 +101,17 @@ def train(input_shape,batch_size, num_epoch, pretrain,
         else:
             early_stop_counter += 1
         print('Elapsed time in epoch ' + str(e+1) +
-              ': ' + str(time.time() - startt))
+              ': ' + str(time.time() - start_t))
 
-        if (e+1) % saveevery == 0:
-            model.save('model/model-%d.h5' % (e+1))
-            print('Saved model %s!' % str(e+1))
+        if (e+1) % save_every == 0:
+            if os.path.isdir('model'):
+                model.save('model/model-%d.h5' % (e+1))
+                print('Saved model %s!' % str(e+1))
+            else:
+                pass
+                
 
-        if earlystopcounter >= PATIENCE:
+        if early_stop_counter >= PATIENCE:
             print('Stop by early stopping')
             print('Best score: '+str(best_metrics))
             break
@@ -131,7 +139,7 @@ def main():
         x_train = x_train.reshape(x_train.shape[0], img_rows, img_cols, 1)
         x_test = x_test.reshape(x_test.shape[0], img_rows, img_cols, 1)
         input_shape = (img_rows, img_cols, 1)
-    
+
     x_train = x_train.astype('float32')
     x_test = x_test.astype('float32')
     x_train /= 255
@@ -144,12 +152,11 @@ def main():
 
     # train
     train(input_shape, args.batch, args.epoch, args.pretrain,
-          args.save_every, x_train, y_train)
+          args.save_every, x_train, y_train, x_test, y_test)
 
 
 '''
-score = model.evaluate(x_test, y_test, batch_size=32,
-                       verbose=1, sample_weight=None)
+score = model.evaluate(x_test, y_test, batch_size=32, verbose=1, sample_weight=None)
 print('Test loss:', score[0])
 print('Test accuracy:', score[1])
 
