@@ -1,4 +1,5 @@
 import numpy as np
+'''
 import matplotlib.pyplot as plt
 from sklearn.metrics import confusion_matrix
 from keras.models import load_model
@@ -6,8 +7,8 @@ from utils import *
 from keras.datasets import mnist
 import keras.backend as K
 import itertools
-
-
+'''
+'''
 def read_dataset():
     (x_train, y_train), (x_test, y_test) = mnist.load_data()
     if K.image_data_format() == 'channels_first':
@@ -20,7 +21,8 @@ def read_dataset():
     x_train = x_train.astype('float32')
     x_test = x_test.astype('float32')
     return x_test, y_test
-
+'''
+'''
 model_path = 'model/model-1.h5'
 model = load_model(model_path)
 np.set_printoptions(precision=2)
@@ -48,3 +50,21 @@ plt.xlabel('Predicted label')
 
 
 plt.show()
+'''
+'''
+(x_train, y_train), (x, y) = mnist.load_data()
+print(x.shape, y)
+x = x.reshape(x.shape[0],28,28,1)
+y = y.reshape(y.shape[0])
+x = np.expand_dims(x,axis=1)
+print(x[0][0][0])
+print(x.shape)
+'''
+
+a = [[[1,1,1],[2,2,2],[3,3,3]],[[4,4,4],[5,5,5],[6,6,6]],[[7,7,7],[8,8,8],[9,9,9]]]
+
+a = np.array(a)
+a =np.expand_dims(a, axis=0)
+for i in range(3):
+    a[0] = 100
+print(a, a.shape)
