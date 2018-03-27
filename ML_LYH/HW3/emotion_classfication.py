@@ -11,7 +11,7 @@ import win_unicode_console
 import time
 win_unicode_console.enable()
 DATA_PATH = r"C:\ws\push\LearnPractice\ML_LYH\HW3\train_data"
-PATIENCE = 5
+PATIENCE = 15
 
 def data_load(train_path):
     x_np_file = open(train_path+r'\x.npy', 'rb')
@@ -108,7 +108,7 @@ def train(batch_size, num_epoch, pretrain,
         start_t = time.time()
 
         for i in range(iter_per_epoch):
-            if i % 1 == 0:
+            if i % 100 == 0:
                 print('Iteration ' + str(i+1))
             X_batch = []
             Y_batch = []
@@ -171,11 +171,11 @@ def train(batch_size, num_epoch, pretrain,
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--epoch', type=int, default=12)
+    parser.add_argument('--epoch', type=int, default=100)
     parser.add_argument('--batch', type=int, default=63)
-    parser.add_argument('--pretrain', type=bool, default=False)
+    parser.add_argument('--pretrain', type=bool, default=True)
     parser.add_argument('--save_every', type=int, default=1)
-    parser.add_argument('--model_name', type=str, default='ec_model/model-1')
+    parser.add_argument('--model_name', type=str, default='ec_model/model-9.h5')
     args = parser.parse_args()
 
     (x_train, y_train), (x_vaild, y_vaild) = data_load(DATA_PATH)

@@ -3,3 +3,4 @@ train_data/
 .gitignore
 my_model_weights
 model/
+ec_model/
