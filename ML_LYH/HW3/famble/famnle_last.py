@@ -26,27 +26,33 @@ def read_np():
     print(x.shape)
     return x,y
 
-def data_load(path):
-    x_pickle=open(r'C:\ws\push\LearnPractice\ML_LYH\HW3\train_data\x.pkl','wb')
-    y_pickle=open(r'C:\ws\push\LearnPractice\ML_LYH\HW3\train_data\y.pkl','wb')
-    fx = open(r"C:\ws\push\LearnPractice\ML_LYH\HW3\train_data\x", 'wb')
-    fy =open(r"C:\ws\push\LearnPractice\ML_LYH\HW3\train_data\y","wb")
+def data_load(path=r'C:\ws\push\LearnPractice\ML_LYH\HW3\train_data\train.csv'):
+    fx = open(r"C:\ws\push\LearnPractice\ML_LYH\HW3\train_data\x.npy", 'wb')
+    fy =open(r"C:\ws\push\LearnPractice\ML_LYH\HW3\train_data\y.npy","wb")
     train_csv = pd.read_csv(path)
     x_train = []
     for i in train_csv.feature:
         x_train.append([num  for num in i.split(" ") ])
-    x_train = np.array(x_train)
+    x_train = np.array(x_train,dtype='float')
     x_train = x_train.reshape(x_train.shape[0], 48,48,1)
-    y_train = np.array(train_csv.label,dtype='int')
-
+    y_train = np.array(train_csv.label, dtype='float')
+    
     np.save(fx, x_train)
     np.save(fy, y_train)
     return x_train, y_train
     
-
+def data_load_2(path=r'C:\ws\push\LearnPractice\ML_LYH\HW3\train_data\train.csv'):
+    fx = open(r"C:\ws\push\LearnPractice\ML_LYH\HW3\train_data\x.npy", 'wb')
+    fy =open(r"C:\ws\push\LearnPractice\ML_LYH\HW3\train_data\y.npy","wb")
+    train_csv = pd.read_csv(path)
+    x_train = np.array(train_csv.feature)
+    y_train = np.array(train_csv.label)
+    print(x_train.shape,y_train.shape)
+    np.save(fx, x_train)
+    np.save(fy, y_train)
 
 start = time.time()
-read_np()
+data_load(r'C:\ws\push\LearnPractice\ML_LYH\HW3\train_data\train.csv')
 print(time.time() - start)
 
 

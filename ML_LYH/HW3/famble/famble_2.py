@@ -149,6 +149,7 @@ def main():
     print(x_test.shape[0], 'test samples')
     y_train = keras.utils.to_categorical(y_train, 10)
     y_test = keras.utils.to_categorical(y_test, 10)
+    print(y_train.shape, y_test.shape)
 
     # train
     train(input_shape, args.batch, args.epoch, args.pretrain,
