@@ -13,6 +13,7 @@ win_unicode_console.enable()
 DATA_PATH = r"C:\ws\push\LearnPractice\ML_LYH\HW3\train_data"
 PATIENCE = 15
 
+
 def data_load(train_path):
     x_np_file = open(train_path+r'\x.npy', 'rb')
     y_np_file = open(train_path+r'\y.npy', 'rb')
@@ -20,16 +21,17 @@ def data_load(train_path):
     y = np.load(y_np_file)
     x_np_file.close()
     y_np_file.close()
-    
+
     x_train = x[:int(x.shape[0]*0.7)]
     x_vaild = x[int(x.shape[0]*0.7)+1:]
     y_train = y[:int(y.shape[0]*0.7)]
     y_vaild = y[int(y.shape[0]*0.7)+1:]
-    
+
     #y_train = utils.to_categorical(y_train, 7)
     #y_vaild = utils.to_categorical(y_vaild, 7)
     print((x_train.shape, y_train.shape), (x_vaild.shape, y_vaild.shape))
     return (x_train, y_train), (x_vaild, y_vaild)
+
 
 def build_model():
     input_img = Input(shape=(48, 48, 1))
@@ -175,7 +177,8 @@ def main():
     parser.add_argument('--batch', type=int, default=63)
     parser.add_argument('--pretrain', type=bool, default=True)
     parser.add_argument('--save_every', type=int, default=1)
-    parser.add_argument('--model_name', type=str, default='ec_model/model-9.h5')
+    parser.add_argument('--model_name', type=str,
+                        default='ec_model/model-9.h5')
     args = parser.parse_args()
 
     (x_train, y_train), (x_vaild, y_vaild) = data_load(DATA_PATH)
