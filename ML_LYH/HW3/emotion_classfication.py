@@ -9,9 +9,23 @@ import numpy as np
 import argparse
 import win_unicode_console
 import time
+import os
 win_unicode_console.enable()
 DATA_PATH = r"C:\ws\push\LearnPractice\ML_LYH\HW3\train_data"
 PATIENCE = 15
+
+
+def del_file(path):
+    count = 0
+    min = 1000
+    for fn in os.listdir(path):
+        count = count+1
+        if min > int(fn[5:-3]):
+            min = int(fn[5:-3])
+            min_fn = fn
+    if count > 10:
+        os.remove(min_fn)
+    return
 
 
 def data_load(train_path):
@@ -159,6 +173,7 @@ def train(batch_size, num_epoch, pretrain,
 
         if (e+1) % save_every == 0:
             model.save('ec_model/model-%d.h5' % (e+1))
+            del_file('ec_model')
             print('Saved model %s!' % str(e+1))
 
         if early_stop_counter >= PATIENCE:
