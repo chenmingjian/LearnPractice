@@ -4,6 +4,8 @@ from keras.layers.convolutional import Conv2D, ZeroPadding2D
 from keras.layers.pooling import MaxPooling2D, AveragePooling2D
 from keras.optimizers import SGD, Adam, Adadelta
 from keras import utils
+from keras.layers.normalization import BatchNormalization
+from sklearn import preprocessing
 import pandas as pd
 import numpy as np
 import argparse
@@ -11,8 +13,9 @@ import win_unicode_console
 import time
 import os
 win_unicode_console.enable()
-DATA_PATH = r"C:\ws\push\LearnPractice\ML_LYH\HW3\train_data"
+DATA_PATH = r"E:\ws\LearnPractice\ML_LYH\HW3\train_data"
 PATIENCE = 15
+
 
 
 def del_file(path):
@@ -20,11 +23,12 @@ def del_file(path):
     min = 1000
     for fn in os.listdir(path):
         count = count+1
-        if min > int(fn[5:-3]):
-            min = int(fn[5:-3])
+        if min > int(fn[6:-3]):
+            min = int(fn[6:-3])
             min_fn = fn
     if count > 10:
-        os.remove(min_fn)
+        os.remove('ec_model'+'\\'+min_fn)
+        del_file(path)
     return
 
 
@@ -35,12 +39,11 @@ def data_load(train_path):
     y = np.load(y_np_file)
     x_np_file.close()
     y_np_file.close()
-
     x_train = x[:int(x.shape[0]*0.7)]
     x_vaild = x[int(x.shape[0]*0.7)+1:]
     y_train = y[:int(y.shape[0]*0.7)]
     y_vaild = y[int(y.shape[0]*0.7)+1:]
-
+    
     #y_train = utils.to_categorical(y_train, 7)
     #y_vaild = utils.to_categorical(y_vaild, 7)
     print((x_train.shape, y_train.shape), (x_vaild.shape, y_vaild.shape))
@@ -81,8 +84,8 @@ def build_model():
     model = Model(inputs=input_img, outputs=predict)
 
     # opt = SGD(lr=0.1, decay=1e-6, momentum=0.9, nesterov=True)
-    # opt = Adam(lr=1e-3)
-    opt = Adadelta(lr=0.1, rho=0.95, epsilon=1e-08)
+    opt = Adam(lr=1e-3)
+    #opt = Adadelta(lr=0.1, rho=0.95, epsilon=1e-08)
     model.compile(loss='categorical_crossentropy',
                   optimizer=opt, metrics=['accuracy'])
     model.summary()
@@ -95,15 +98,16 @@ def train(batch_size, num_epoch, pretrain,
 
     if pretrain == False:
         model = build_model()
+        file_num = 0
     else:
         model = load_model(model_name)
-
+        file_num = int(model_name[15:-3])
     '''
     "1 Epoch" means you have been looked all of the training data once already.
     Batch size B means you look B instances at once when updating your parameter.
     Thus, given 320 instances, batch size 32, you need 10 iterations in 1 epoch.
     '''
-
+    
     num_instances = len(train_labels)
 
     iter_per_epoch = int(num_instances / batch_size) + 1
@@ -115,7 +119,7 @@ def train(batch_size, num_epoch, pretrain,
     total_start_t = time.time()
     best_metrics = 0.0
     early_stop_counter = 0
-    for e in range(num_epoch):
+    for e in range(file_num, file_num + num_epoch):
         # shuffle data in every epoch
         rand_idxs = np.random.permutation(num_instances)
         print('#######')
@@ -190,10 +194,10 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--epoch', type=int, default=100)
     parser.add_argument('--batch', type=int, default=63)
-    parser.add_argument('--pretrain', type=bool, default=True)
+    parser.add_argument('--pretrain', type=bool, default=False)
     parser.add_argument('--save_every', type=int, default=1)
     parser.add_argument('--model_name', type=str,
-                        default='ec_model/model-9.h5')
+                        default='ec_model/model-30.h5')
     args = parser.parse_args()
 
     (x_train, y_train), (x_vaild, y_vaild) = data_load(DATA_PATH)
@@ -211,4 +215,5 @@ def main():
 
 
 if __name__ == '__main__':
+    os.system(r'cd E:\ws\LearnPractice\ML_LYH\HW3')
     main()
